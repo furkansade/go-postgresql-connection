@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"database/sql"
@@ -21,31 +21,27 @@ var db *sql.DB // database/sql package pointer's
 // initialization func
 func init() {
 	var err error
-	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname) // connection string
+	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
-	db, err = sql.Open("postgres", connString) // open the connection
-
+	db, err = sql.Open("postgres", connString)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }
 
 type Product struct {
-	ID          int
-	Title       string
-	Description string
-	Price       float32
+	ID                 int
+	Title, Description string
+	Price              float32
 }
 
 func InsertProduct(data Product) {
-	result, err := db.Exec("INSERT INTO products(title, description, price) VALUES ($1, $2, $3)", data.Title, data.Description, data.Price)
+	result, err := db.Exec("INSERT INTO products(title, description, price) VALUES($1, $2, $3)", data.Title, data.Description, data.Price)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	rowsAffected, err := result.RowsAffected()
-	fmt.Printf("Etkilenen kayıt sayısı: (%d)", rowsAffected)
+	fmt.Printf("Etkilenen kayıt sayısı: %d\n", rowsAffected)
 }
 
 func UpdateProduct(data Product) {
@@ -53,9 +49,8 @@ func UpdateProduct(data Product) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	rowsAffected, err := result.RowsAffected()
-	fmt.Printf("Etkilenen kayıt sayısı: (%d)", rowsAffected)
+	fmt.Printf("Güncellenen kayıt sayısı: %d\n", rowsAffected)
 }
 
 func GetProducts() {
@@ -78,11 +73,26 @@ func GetProducts() {
 		}
 		products = append(products, prd) // prd's append to products
 	}
+
 	if err = rows.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	for _, value := range products {
-		fmt.Printf("%d - %s, %s, %.2f\n", value.ID, value.Title, value.Description, value.Price)
+	for _, pr := range products {
+		fmt.Printf("%d - %s | %s | %.2f\n", pr.ID, pr.Title, pr.Description, pr.Price)
 	}
 } // son scope
+
+func GetProductByID(id int) {
+	var product string
+	var price float32
+	err := db.QueryRow("SELECT title, price FROM products WHERE id=$1", id).Scan(&product, &price)
+	switch {
+	case err == sql.ErrNoRows:
+		log.Printf("No product with that ID.")
+	case err != nil:
+		log.Fatal(err)
+	default:
+		fmt.Printf("Product -> %s | %.2f₺\n", product, price)
+	}
+}
