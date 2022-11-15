@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	_ "github.com/lib/pq" // auxiliary tool taht will work with database/sql
 )
@@ -23,6 +24,10 @@ func init() {
 	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname) // connection string
 
 	db, err = sql.Open("postgres", connString) // open the connection
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }
 
