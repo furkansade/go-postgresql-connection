@@ -11,6 +11,8 @@ func main() {
 	}
 	models.InsertProduct(product)
 
+	// models.DeleteProduct(2)
+
 	/* product := models.Product{
 		ID:          2,
 		Title:       "System Interview",

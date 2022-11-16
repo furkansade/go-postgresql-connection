@@ -44,6 +44,15 @@ func InsertProduct(data Product) {
 	fmt.Printf("Etkilenen kayıt sayısı: %d\n", rowsAffected)
 }
 
+func DeleteProduct(id int) {
+	result, err := db.Exec("DELETE FROM cars WHERE id=$1", id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	rowsAffected, err := result.RowsAffected()
+	fmt.Printf("Silinen kayıt sayısı: %d\n", rowsAffected)
+}
+
 func UpdateProduct(data Product) {
 	result, err := db.Exec("UPDATE products SET title=$2, description=$3, price=$4 WHERE id=$1", data.ID, data.Title, data.Description, data.Price)
 	if err != nil {
